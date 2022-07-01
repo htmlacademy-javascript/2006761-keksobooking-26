@@ -49,4 +49,4 @@ const createObject = function() {
   };
 };
 
-export const createObjectsArray = Array.from({length: SIMILAR_AD_COUNT}, createObject);
+export const objectsArray = Array.from({length: SIMILAR_AD_COUNT}, createObject);
