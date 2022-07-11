@@ -12,4 +12,6 @@ function getRandomNumberPoint(min, max, digits = 4) {
   return +result.toFixed(digits);
 }
 
-export {getRandomNumber, getRandomNumberPoint};
+const getRandomArrayElement = (elements) => elements[getRandomNumber(0, elements.length - 1)];
+
+export {getRandomNumber, getRandomNumberPoint, getRandomArrayElement};
