@@ -12,7 +12,7 @@ const housingTypesTranslate = {
   palace: 'Дворец',
   hotel: 'Отель',
 };
-const CHECK_TIMES = ['12:00', '13:00', '13:00'];
+const CHECK_TIMES = ['12:00', '13:00', '14:00'];
 const FEATURES_TYPES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 const DESCRIPTIONS = [
   'Из окон открывается удивительный панорамный вид ',
