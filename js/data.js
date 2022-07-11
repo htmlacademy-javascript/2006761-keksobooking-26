@@ -1,10 +1,17 @@
-import {getRandomNumber, getRandomNumberPoint} from './utils.js';
+import {getRandomNumber, getRandomNumberPoint, getRandomArrayElement} from './utils.js';
 
 const TITLES = ['Шикарная квартира с видом на озеро',
   'Новый красивый дом',
   'Просторная 3-комнатная квартира',
 ];
 const HOUSING_TYPES = ['palace', 'flat', 'house', 'bungalow', 'hotel'];
+const housingTypesTranslate = {
+  flat: 'Квартира',
+  bungalow: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец',
+  hotel: 'Отель',
+};
 const CHECK_TIMES = ['12:00', '13:00', '13:00'];
 const FEATURES_TYPES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 const DESCRIPTIONS = [
@@ -24,7 +31,7 @@ const createObject = function() {
   const photoNumber = String(getRandomNumber(1, 10));
   const lat = getRandomNumberPoint(35.65000, 35.70000, 5);
   const lng = getRandomNumberPoint(139.70000, 139.80000, 5);
-  const getRandomArrayElement = (elements) => elements[getRandomNumber(0, elements.length - 1)];
+
   return {
     author: {
       avatar: `img/avatars/user${photoNumber.padStart(2, '0')}.png`
@@ -50,3 +57,4 @@ const createObject = function() {
 };
 
 export const objectsArray = Array.from({length: SIMILAR_AD_COUNT}, createObject);
+export {housingTypesTranslate};
