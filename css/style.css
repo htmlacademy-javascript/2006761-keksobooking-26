@@ -407,6 +407,10 @@ fieldset {
   margin-right: 14px;
 }
 
+.ad-form__error-text {
+  color: red;
+}
+
 .ad-form__slider.noUi-target:not(#fake-id) {
   width: calc(100% - 20px);
   height: 5px;
