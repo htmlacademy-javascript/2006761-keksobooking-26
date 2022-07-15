@@ -2,11 +2,15 @@ const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
 const adFormElements = adForm.querySelectorAll('fieldset');
 const filterFormElements = filterForm.querySelectorAll(['select', 'fieldset']);
+const timeForm = adForm.querySelector('.ad-form__element--time');
 
 const roomPriceField = adForm.querySelector('#price');
 const roomNumberField = adForm.querySelector('#room_number');
 const roomCapacityField = adForm.querySelector('#capacity');
-const formHousingTypes = adForm.querySelector('#type');
+const housingTypesForm = adForm.querySelector('#type');
+const checkInField = adForm.querySelector('#timein');
+const checkOutField = adForm.querySelector('#timeout');
+
 
 const CAPACITY_ROOMS = {
   '1': ['1'],
@@ -37,11 +41,11 @@ Pristine.addMessages('ru', {
   minlength: `Не менее \${${1}} символов`,
 });
 
-const getMinPrice = () => LIVING_PRICES[formHousingTypes.value];
+const getMinPrice = () => LIVING_PRICES[housingTypesForm.value];
 roomPriceField.placeholder = getMinPrice();
 roomPriceField.min = getMinPrice();
 
-formHousingTypes.addEventListener('change', () => {
+housingTypesForm.addEventListener('change', () => {
   roomPriceField.placeholder = getMinPrice();
   roomPriceField.min = getMinPrice();
 });
@@ -53,6 +57,12 @@ pristine.addValidator(roomCapacityField, validateCapacity, 'Гостей дол�
 const validatePrice = (value) => value >= getMinPrice() && value <= 100000;
 const getPriceErrorMessage = (value) => (value >= getMinPrice()) ? 'Не более 100000' : `Не менее ${getMinPrice()}`;
 pristine.addValidator(roomPriceField, validatePrice, getPriceErrorMessage);
+
+//checkin-checkout
+timeForm.addEventListener('change', (evt) => {
+  checkInField.value = evt.target.value;
+  checkOutField.value = evt.target.value;
+});
 
 // Enable/Disable form
 const setDisabledForm = () => {
@@ -81,7 +91,6 @@ const setEnabledForm = () => {
 
 //submit event
 adForm.addEventListener('submit', (evt) => {
-
   if(!pristine.validate()) {
     evt.preventDefault();
   }
