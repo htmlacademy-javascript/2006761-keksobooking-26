@@ -6,12 +6,21 @@ const filterFormElements = filterForm.querySelectorAll(['select', 'fieldset']);
 const roomPriceField = adForm.querySelector('#price');
 const roomNumberField = adForm.querySelector('#room_number');
 const roomCapacityField = adForm.querySelector('#capacity');
+const formHousingTypes = adForm.querySelector('#type');
 
 const CAPACITY_ROOMS = {
   '1': ['1'],
   '2': ['2', '1'],
   '3': ['3', '2', '1'],
   '100': ['0'],
+};
+
+const LIVING_PRICES = {
+  'bungalow': 0,
+  'flat': 1000,
+  'hotel': 3000,
+  'house': 5000,
+  'palace': 10000,
 };
 
 Pristine.setLocale('ru');
@@ -28,12 +37,21 @@ Pristine.addMessages('ru', {
   minlength: `Не менее \${${1}} символов`,
 });
 
+const getMinPrice = () => LIVING_PRICES[formHousingTypes.value];
+roomPriceField.placeholder = getMinPrice();
+roomPriceField.min = getMinPrice();
+
+formHousingTypes.addEventListener('change', () => {
+  roomPriceField.placeholder = getMinPrice();
+  roomPriceField.min = getMinPrice();
+});
+
 //Validate
 const validateCapacity = (value) => CAPACITY_ROOMS[roomNumberField.value].includes(value);
 pristine.addValidator(roomCapacityField, validateCapacity, 'Гостей должно быть не больше чем комнат');
 
-const validatePrice = (value) => value >= 0 && value <= 100000;
-const getPriceErrorMessage = (value) => (value >= 0) ? 'Не более 100000' : 'Не менее 0';
+const validatePrice = (value) => value >= getMinPrice() && value <= 100000;
+const getPriceErrorMessage = (value) => (value >= getMinPrice()) ? 'Не более 100000' : `Не менее ${getMinPrice()}`;
 pristine.addValidator(roomPriceField, validatePrice, getPriceErrorMessage);
 
 // Enable/Disable form
