@@ -65,16 +65,16 @@ noUiSlider.create(sliderForm, {
     },
   },
 });
-
+sliderForm.noUiSlider.updateOptions({start: getMinPrice()});
 //Event type of housing
 housingTypesForm.addEventListener('change', () => {
   roomPriceField.placeholder = getMinPrice();
+  sliderForm.noUiSlider.updateOptions({start: getMinPrice()});
   pristine.validate(roomPriceField);
 });
 
 //Synth slider and price
 sliderForm.noUiSlider.on('change', () => {
-  sliderForm.noUiSlider.updateOptions({padding: 0});
   roomPriceField.value = sliderForm.noUiSlider.get();
   pristine.validate(roomPriceField);
 });
@@ -125,10 +125,7 @@ const setEnabledForm = () => {
     element.removeAttribute('disabled');
   });
 
-  sliderForm.noUiSlider.updateOptions({
-    start: getMinPrice(),
-    padding: [getMinPrice(), 0],
-  });
+  sliderForm.noUiSlider.updateOptions({start: getMinPrice()});
 
 };
 
