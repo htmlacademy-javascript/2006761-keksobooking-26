@@ -55,3 +55,5 @@ const createOffer = (object) => {
 };
 
 adInsert.append(createOffer(objectsArray[0]));
+
+export {createOffer};
