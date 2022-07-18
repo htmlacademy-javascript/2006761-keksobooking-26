@@ -1,5 +1,12 @@
 import {getRandomNumber, getRandomNumberPoint, getRandomArrayElement} from './utils.js';
 
+const SIMILAR_AD_COUNT = 10;
+const DECIMAL_LENGTH = 5;
+const MIN_LAT = 35.65000;
+const MAX_LAT = 35.70000;
+const MIN_LNG = 139.70000;
+const MAX_LNG = 139.80000;
+
 const TITLES = ['Шикарная квартира с видом на озеро',
   'Новый красивый дом',
   'Просторная 3-комнатная квартира',
@@ -25,12 +32,10 @@ const ROOMS_PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg'
 ];
 
-const SIMILAR_AD_COUNT = 10;
-
 const createObject = function() {
   const photoNumber = String(getRandomNumber(1, 10));
-  const lat = getRandomNumberPoint(35.65000, 35.70000, 5);
-  const lng = getRandomNumberPoint(139.70000, 139.80000, 5);
+  const lat = getRandomNumberPoint(MIN_LAT, MAX_LAT, DECIMAL_LENGTH);
+  const lng = getRandomNumberPoint(MIN_LNG, MAX_LNG, DECIMAL_LENGTH);
 
   return {
     author: {
@@ -57,4 +62,4 @@ const createObject = function() {
 };
 
 export const objectsArray = Array.from({length: SIMILAR_AD_COUNT}, createObject);
-export {housingTypesTranslate};
+export {housingTypesTranslate, DECIMAL_LENGTH};

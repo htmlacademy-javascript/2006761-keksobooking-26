@@ -1,8 +1,11 @@
+const MAX_PRICE = 100000;
+
 const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
 const adFormElements = adForm.querySelectorAll('fieldset');
 const filterFormElements = filterForm.querySelectorAll(['select', 'fieldset']);
 const timeForm = adForm.querySelector('.ad-form__element--time');
+const sliderForm = adForm.querySelector('.ad-form__slider');
 
 const roomPriceField = adForm.querySelector('#price');
 const roomNumberField = adForm.querySelector('#room_number');
@@ -10,7 +13,7 @@ const roomCapacityField = adForm.querySelector('#capacity');
 const housingTypesForm = adForm.querySelector('#type');
 const checkInField = adForm.querySelector('#timein');
 const checkOutField = adForm.querySelector('#timeout');
-
+const addressForm = adForm.querySelector('#address');
 
 const CAPACITY_ROOMS = {
   '1': ['1'],
@@ -43,19 +46,50 @@ Pristine.addMessages('ru', {
 
 const getMinPrice = () => LIVING_PRICES[housingTypesForm.value];
 roomPriceField.placeholder = getMinPrice();
-roomPriceField.min = getMinPrice();
 
+//Create slider
+noUiSlider.create(sliderForm, {
+  range: {
+    min: 0,
+    max: MAX_PRICE,
+  },
+  start: 0,
+  step: 1,
+  connect: 'lower',
+  format: {
+    to: function (value) {
+      return value.toFixed(0);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
+});
+
+//Event type of housing
 housingTypesForm.addEventListener('change', () => {
   roomPriceField.placeholder = getMinPrice();
-  roomPriceField.min = getMinPrice();
+  pristine.validate(roomPriceField);
+});
+
+//Synth slider and price
+sliderForm.noUiSlider.on('change', () => {
+  sliderForm.noUiSlider.updateOptions({padding: 0});
+  roomPriceField.value = sliderForm.noUiSlider.get();
+  pristine.validate(roomPriceField);
+});
+//Synth price and slider
+roomPriceField.addEventListener('change', () => {
+  sliderForm.noUiSlider.set(roomPriceField.value);
+  pristine.validate(roomPriceField);
 });
 
 //Validate
 const validateCapacity = (value) => CAPACITY_ROOMS[roomNumberField.value].includes(value);
 pristine.addValidator(roomCapacityField, validateCapacity, 'Гостей должно быть не больше чем комнат');
 
-const validatePrice = (value) => value >= getMinPrice() && value <= 100000;
-const getPriceErrorMessage = (value) => (value >= getMinPrice()) ? 'Не более 100000' : `Не менее ${getMinPrice()}`;
+const validatePrice = (value) => value >= getMinPrice() && value <= MAX_PRICE;
+const getPriceErrorMessage = (value) => (value >= getMinPrice()) ? `Не более ${MAX_PRICE}` : `Не менее ${getMinPrice()}`;
 pristine.addValidator(roomPriceField, validatePrice, getPriceErrorMessage);
 
 //checkin-checkout
@@ -75,6 +109,9 @@ const setDisabledForm = () => {
   filterFormElements.forEach((element) => {
     element.setAttribute('disabled', 'disabled');
   });
+
+  sliderForm.setAttribute('disabled', true);
+
 };
 
 const setEnabledForm = () => {
@@ -87,6 +124,12 @@ const setEnabledForm = () => {
   filterFormElements.forEach((element) => {
     element.removeAttribute('disabled');
   });
+
+  sliderForm.noUiSlider.updateOptions({
+    start: getMinPrice(),
+    padding: [getMinPrice(), 0],
+  });
+
 };
 
 //submit event
@@ -96,4 +139,4 @@ adForm.addEventListener('submit', (evt) => {
   }
 });
 
-export {setDisabledForm, setEnabledForm};
+export {setDisabledForm, setEnabledForm, addressForm, adForm};
