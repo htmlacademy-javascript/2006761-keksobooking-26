@@ -1,3 +1,6 @@
+import {sendData} from './api.js';
+import {resetMap} from './map.js';
+
 const MAX_PRICE = 100000;
 
 const adForm = document.querySelector('.ad-form');
@@ -6,14 +9,20 @@ const adFormElements = adForm.querySelectorAll('fieldset');
 const filterFormElements = filterForm.querySelectorAll(['select', 'fieldset']);
 const timeForm = adForm.querySelector('.ad-form__element--time');
 const sliderForm = adForm.querySelector('.ad-form__slider');
+const submitButton = adForm.querySelector('.ad-form__submit');
+const resetButtonForm = adForm.querySelector('.ad-form__reset');
 
 const roomPriceField = adForm.querySelector('#price');
 const roomNumberField = adForm.querySelector('#room_number');
 const roomCapacityField = adForm.querySelector('#capacity');
 const housingTypesForm = adForm.querySelector('#type');
+const defaultSelectedOption = housingTypesForm.querySelector('option[selected]');
 const checkInField = adForm.querySelector('#timein');
 const checkOutField = adForm.querySelector('#timeout');
 const addressForm = adForm.querySelector('#address');
+
+const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
+const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
 
 const CAPACITY_ROOMS = {
   '1': ['1'],
@@ -45,6 +54,8 @@ Pristine.addMessages('ru', {
 });
 
 const getMinPrice = () => LIVING_PRICES[housingTypesForm.value];
+const getDefaultPrice = () => LIVING_PRICES[defaultSelectedOption.value];
+
 roomPriceField.placeholder = getMinPrice();
 
 //Create slider
@@ -82,6 +93,7 @@ housingTypesForm.addEventListener('change', () => {
       'max': MAX_PRICE
     }
   });
+  sliderForm.noUiSlider.set(roomPriceField.value);
   pristine.validate(roomPriceField);
 });
 
@@ -147,11 +159,108 @@ const setEnabledForm = () => {
 
 };
 
-//submit event
-adForm.addEventListener('submit', (evt) => {
-  if(!pristine.validate()) {
+//Success/error messages
+const getSuccessMessage = () => {
+  const message = successMessageTemplate.cloneNode(true);
+  document.body.appendChild(message);
+
+  const escEvent = (evt) => {
+    if (evt.key === 'Escape') {
+      message.remove();
+      document.removeEventListener('keydown', escEvent);
+    }
+  };
+
+  document.addEventListener('keydown', escEvent);
+
+
+  const clickEvent = () => {
+    document.removeEventListener('click', clickEvent);
+    message.remove();
+  };
+
+  document.addEventListener('click', clickEvent);
+};
+
+const getErrorMessage = (err) => {
+  const message = errorMessageTemplate.cloneNode(true);
+  document.body.appendChild(message);
+  const closeButton = document.querySelector('.error__button');
+  const errorText = document.querySelector('.error__message');
+  errorText.textContent = err;
+
+  closeButton.addEventListener('click', () => {
+    message.remove();
+  });
+
+  const escEvent = (evt) => {
+    if (evt.key === 'Escape') {
+      message.remove();
+      document.removeEventListener('keydown', escEvent);
+    }
+  };
+
+  document.addEventListener('keydown', escEvent);
+
+
+  const clickEvent = () => {
+    document.removeEventListener('click', clickEvent);
+    message.remove();
+  };
+
+  document.addEventListener('click', clickEvent);
+};
+
+//Enable/disable submit button
+const disableSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = 'Ожидайте...';
+};
+
+const enableSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = 'Опубликовать';
+};
+
+//Submit event
+const letSubmitForm = () => {
+  adForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
-  }
+    const formData = new FormData(evt.target);
+
+    if(pristine.validate()) {
+      sendData(formData);
+    }
+  });
+};
+const resetForm = () => {
+  adForm.reset();
+  pristine.reset();
+  resetMap();
+  roomPriceField.placeholder = getDefaultPrice();
+  sliderForm.noUiSlider.updateOptions({
+    start: getDefaultPrice(),
+    range: {
+      'min': getDefaultPrice(),
+      'max': MAX_PRICE
+    }
+  });
+};
+
+
+resetButtonForm.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  resetForm();
 });
 
-export {setDisabledForm, setEnabledForm, addressForm, adForm};
+export {
+  letSubmitForm,
+  resetForm,
+  enableSubmitButton,
+  disableSubmitButton,
+  getSuccessMessage,
+  getErrorMessage,
+  setDisabledForm,
+  setEnabledForm,
+  addressForm
+};

@@ -1,6 +1,11 @@
-import {objectsArray, housingTypesTranslate} from './data.js';
+const housingTypesTranslate = {
+  flat: 'Квартира',
+  bungalow: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец',
+  hotel: 'Отель',
+};
 
-const adInsert = document.querySelector('#map-canvas');
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 const checkExistence = (templateElement, value) => (value) ? value : templateElement.remove();
 
@@ -53,7 +58,5 @@ const createOffer = (object) => {
 
   return cloneCard;
 };
-
-adInsert.append(createOffer(objectsArray[0]));
 
 export {createOffer};
