@@ -2,12 +2,15 @@ import './popup.js';
 import './form.js';
 import './map.js';
 import './api.js';
+import './utils.js';
 
-import {setEnabledForm, letSubmitForm} from './form.js';
-import {drawMarkers, loadMap} from './map.js';
-import {getData} from './api.js';
+import {setEnabledForm, setDisabledForm, letSubmitForm, mapFilterUpdate, letMapFilter} from './form.js';
+import {loadMap} from './map.js';
 
-setEnabledForm();
-letSubmitForm();
-loadMap();
-getData(drawMarkers);
+setDisabledForm();
+loadMap(() => {
+  setEnabledForm();
+  letSubmitForm();
+  letMapFilter();
+  mapFilterUpdate();
+});

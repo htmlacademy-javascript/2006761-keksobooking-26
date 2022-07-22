@@ -10,6 +10,8 @@ const centerOfTokyo = {
 };
 
 const map = L.map('map-canvas');
+const mainMarkerGroup = L.layerGroup().addTo(map);
+const markerGroup = L.layerGroup().addTo(map);
 
 const mainPinIcon = L.icon({
   iconUrl: './img/main-pin.svg',
@@ -25,9 +27,7 @@ const mainPinMarker = L.marker(
   },
 );
 
-const addMainPinMarker = () => mainPinMarker.addTo(map);
-
-const markerGroup = L.layerGroup().addTo(map);
+const addMainPinMarker = () => mainPinMarker.addTo(mainMarkerGroup);
 
 const groupPinIcon = L.icon({
   iconUrl: './img/pin.svg',
@@ -49,7 +49,7 @@ const drawMarker = (object) => {
 };
 
 const drawMarkers = (array) => {
-  array.slice(0, MAX_OBJECTS - 1).forEach((element) => {
+  array.forEach((element) => {
     drawMarker(element);
   });
 };
@@ -64,10 +64,11 @@ mainPinMarker.on('move', (evt) => {
   addressForm.value = `${lat.toFixed(DECIMAL_LENGTH)}, ${lng.toFixed(DECIMAL_LENGTH)}`;
 });
 
-const loadMap = () => {
+const loadMap = (cb) => {
   setDefaultAddress();
   map.on('load', () => {
     addMainPinMarker();
+    cb();
   }).setView(centerOfTokyo, MAP_SCALE);
 
   L.tileLayer(
@@ -78,12 +79,6 @@ const loadMap = () => {
   ).addTo(map);
 };
 
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-).addTo(map);
 
 //Reset mainPinMarker
 const resetMap = () => {
@@ -92,4 +87,8 @@ const resetMap = () => {
   map.closePopup();
 };
 
-export {drawMarkers, loadMap, resetMap};
+const clearMarkers = () => {
+  markerGroup.clearLayers();
+};
+
+export {drawMarkers, loadMap, resetMap, clearMarkers, MAX_OBJECTS};

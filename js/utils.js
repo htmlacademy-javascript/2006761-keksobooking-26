@@ -1,17 +1,23 @@
-function getRandomNumber(min, max) {
-  const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
-  const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
+const declination = (number, words) => {
+  const value = number % 100;
+  if (value % 10 === 1) {
+    return words[0];
+  }
+  if (value % 10 > 1 && value % 10 < 5 || words[2] === undefined) {
+    return words[1];
+  }
+  if (value > 10 && value < 20){
+    return words[2];
+  }
+  return words[2];
+};
+
+function debounce (callback, timeoutDelay = 500) {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
 }
 
-function getRandomNumberPoint(min, max, digits = 4) {
-  const lower = Math.min(Math.abs(min), Math.abs(max));
-  const upper = Math.max(Math.abs(min), Math.abs(max));
-  const result = Math.random() * (upper - lower) + lower;
-  return +result.toFixed(digits);
-}
-
-const getRandomArrayElement = (elements) => elements[getRandomNumber(0, elements.length - 1)];
-
-export {getRandomNumber, getRandomNumberPoint, getRandomArrayElement};
+export {declination, debounce};

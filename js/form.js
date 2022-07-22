@@ -1,7 +1,9 @@
-import {sendData} from './api.js';
-import {resetMap} from './map.js';
+import {sendData, getData} from './api.js';
+import {resetMap, clearMarkers, drawMarkers, MAX_OBJECTS} from './map.js';
+import {debounce} from './utils.js';
 
 const MAX_PRICE = 100000;
+const RERENDER_DELAY = 500;
 
 const adForm = document.querySelector('.ad-form');
 const filterForm = document.querySelector('.map__filters');
@@ -20,6 +22,8 @@ const defaultSelectedOption = housingTypesForm.querySelector('option[selected]')
 const checkInField = adForm.querySelector('#timein');
 const checkOutField = adForm.querySelector('#timeout');
 const addressForm = adForm.querySelector('#address');
+const mapFiltersElement = document.querySelector('.map__filters');
+const housingFeaturesElement = mapFiltersElement.querySelector('#housing-features');
 
 const successMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorMessageTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -39,6 +43,24 @@ const LIVING_PRICES = {
   'palace': 10000,
 };
 
+const PRICE_RANGE_FILTER = {
+  low: {
+    minPrice: 0,
+    maxPrice: 10000,
+  },
+  middle: {
+    minPrice: 10000,
+    maxPrice: 50000,
+  },
+  high: {
+    minPrice: 50000,
+    maxPrice: 100000,
+  },
+  any: {
+    minPrice: 0,
+    maxPrice: 100000,
+  },
+};
 Pristine.setLocale('ru');
 
 const pristine = new Pristine(adForm, {
@@ -86,6 +108,7 @@ sliderForm.noUiSlider.updateOptions({
 //Event type of housing
 housingTypesForm.addEventListener('change', () => {
   roomPriceField.placeholder = getMinPrice();
+  roomPriceField.min = getMinPrice();
   sliderForm.noUiSlider.updateOptions({
     start: getMinPrice(),
     range: {
@@ -148,7 +171,7 @@ const setEnabledForm = () => {
   filterFormElements.forEach((element) => {
     element.removeAttribute('disabled');
   });
-
+  sliderForm.removeAttribute('disabled');
   sliderForm.noUiSlider.updateOptions({
     start: getMinPrice(),
     range: {
@@ -222,6 +245,68 @@ const enableSubmitButton = () => {
   submitButton.textContent = 'Опубликовать';
 };
 
+//filter
+const getFilteredAds = (ads) => {
+  const housingTypeElement = mapFiltersElement.querySelector('#housing-type').value;
+  const housingPriceElement = mapFiltersElement.querySelector('#housing-price').value;
+  const housingRoomsElement = mapFiltersElement.querySelector('#housing-rooms').value;
+  const housingGuestsElement = mapFiltersElement.querySelector('#housing-guests').value;
+
+  const filterType = (ad) => housingTypeElement === ad.offer.type || housingTypeElement === 'any';
+  const filterPrice = (ad) => (ad.offer.price >= PRICE_RANGE_FILTER[housingPriceElement].minPrice
+    && ad.offer.price <= PRICE_RANGE_FILTER[housingPriceElement].maxPrice);
+  const filterRooms = (ad) => ad.offer.rooms.toString() === housingRoomsElement || housingRoomsElement === 'any';
+  const filterGuests = (ad) => ad.offer.guests.toString() === housingGuestsElement || housingGuestsElement === 'any';
+  const filterFeatures = (ad) => {
+
+    const checkedFilters = housingFeaturesElement.querySelectorAll('input:checked');
+    const tempFeatures = [];
+    checkedFilters.forEach((el) => tempFeatures.push(el.value));
+    if (ad.offer.features){
+      return tempFeatures.every((feature) => ad.offer.features.includes(feature));
+    }
+    return false;
+  };
+  const checkFilters = (element) =>
+    filterType(element)
+  && filterPrice(element)
+  && filterRooms(element)
+  && filterGuests(element)
+  && filterFeatures(element);
+
+  const filteredAds = [];
+  for (let i = 0; i < ads.length; i++) {
+    if(checkFilters(ads[i])) {
+      filteredAds.push(ads[i]);
+    }
+  }
+  return filteredAds.slice(0, MAX_OBJECTS);
+};
+
+const letMapFilter = () => {
+  getData((ads) => {
+    drawMarkers(getFilteredAds(ads));
+  });
+};
+
+const mapFilterUpdate = () => {
+  mapFiltersElement.addEventListener('change', debounce(() => {
+    getData((ads) => {
+      clearMarkers();
+      drawMarkers(getFilteredAds(ads));
+    });
+  }, RERENDER_DELAY)
+  );
+};
+
+const resetMapFilters = () => {
+  mapFiltersElement.reset();
+  getData((ads) => {
+    clearMarkers();
+    drawMarkers(getFilteredAds(ads));
+  });
+};
+
 //Submit event
 const letSubmitForm = () => {
   adForm.addEventListener('submit', (evt) => {
@@ -237,6 +322,8 @@ const resetForm = () => {
   adForm.reset();
   pristine.reset();
   resetMap();
+  resetMapFilters();
+  letMapFilter();
   roomPriceField.placeholder = getDefaultPrice();
   sliderForm.noUiSlider.updateOptions({
     start: getDefaultPrice(),
@@ -246,7 +333,6 @@ const resetForm = () => {
     }
   });
 };
-
 
 resetButtonForm.addEventListener('click', (evt) => {
   evt.preventDefault();
@@ -262,5 +348,8 @@ export {
   getErrorMessage,
   setDisabledForm,
   setEnabledForm,
-  addressForm
+  addressForm,
+  resetMapFilters,
+  letMapFilter,
+  mapFilterUpdate
 };
