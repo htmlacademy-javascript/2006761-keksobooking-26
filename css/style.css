@@ -612,6 +612,12 @@ fieldset {
   border-radius: 5px;
 }
 
+.ad-form__photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+ }
+
 .ad-form__element--submit {
   -ms-flex-preferred-size: 100%;
       flex-basis: 100%;
