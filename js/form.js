@@ -1,6 +1,7 @@
-import {sendData, getData} from './api.js';
+import {sendData} from './api.js';
 import {resetMap, clearMarkers, drawMarkers, MAX_OBJECTS} from './map.js';
 import {debounce} from './utils.js';
+import {resetPicture} from './photos.js';
 
 const MAX_PRICE = 100000;
 const RERENDER_DELAY = 500;
@@ -283,28 +284,22 @@ const getFilteredAds = (ads) => {
   return filteredAds.slice(0, MAX_OBJECTS);
 };
 
-const letMapFilter = () => {
-  getData((ads) => {
-    drawMarkers(getFilteredAds(ads));
-  });
+const letMapFilter = (ads) => {
+  drawMarkers(getFilteredAds(ads));
 };
 
-const mapFilterUpdate = () => {
+const mapFilterUpdate = (ads) => {
   mapFiltersElement.addEventListener('change', debounce(() => {
-    getData((ads) => {
-      clearMarkers();
-      drawMarkers(getFilteredAds(ads));
-    });
+    clearMarkers();
+    drawMarkers(getFilteredAds(ads));
   }, RERENDER_DELAY)
   );
 };
 
-const resetMapFilters = () => {
+const resetMapFilters = (ads) => {
   mapFiltersElement.reset();
-  getData((ads) => {
-    clearMarkers();
-    drawMarkers(getFilteredAds(ads));
-  });
+  clearMarkers();
+  drawMarkers(getFilteredAds(ads));
 };
 
 //Submit event
@@ -324,6 +319,7 @@ const resetForm = () => {
   resetMap();
   resetMapFilters();
   letMapFilter();
+  resetPicture();
   roomPriceField.placeholder = getDefaultPrice();
   sliderForm.noUiSlider.updateOptions({
     start: getDefaultPrice(),
