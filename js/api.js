@@ -42,4 +42,3 @@ const sendData = (body) => {
 };
 
 export {getData, sendData};
-

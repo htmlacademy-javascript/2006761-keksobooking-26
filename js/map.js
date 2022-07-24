@@ -48,9 +48,9 @@ const drawMarker = (object) => {
   marker.addTo(markerGroup).bindPopup(createOffer(object));
 };
 
-const drawMarkers = (array) => {
-  array.forEach((element) => {
-    drawMarker(element);
+const drawMarkers = (ads) => {
+  ads.forEach((ad) => {
+    drawMarker(ad);
   });
 };
 
