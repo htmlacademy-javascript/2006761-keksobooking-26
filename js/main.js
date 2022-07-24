@@ -3,6 +3,7 @@ import './form.js';
 import './map.js';
 import './api.js';
 import './utils.js';
+import './photos.js';
 
 import {setEnabledForm, setDisabledForm, letSubmitForm, mapFilterUpdate, letMapFilter} from './form.js';
 import {loadMap} from './map.js';

@@ -8,8 +8,8 @@ const housingTypesTranslate = {
   hotel: 'Отель',
 };
 
-const declinationRoom = ['комната', 'комнаты', 'комнат'];
-const declinationGuest = ['гостя', 'гостей'];
+const declinationRooms = ['комната', 'комнаты', 'комнат'];
+const declinationGuests = ['гостя', 'гостей'];
 
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 const checkExistence = (templateElement, value) => (value) ? value : templateElement.remove();
@@ -34,8 +34,8 @@ const createOffer = (object) => {
   offerAddress.textContent = checkExistence(offerAddress, address);
   offerPrice.textContent = checkExistence(offerPrice, `${price} р/ночь`);
   offerType.textContent = checkExistence(offerType, housingTypesTranslate[type]);
-  offerCapacity.textContent = `${rooms} ${declination(rooms, declinationRoom)}
-   для ${guests} ${declination(guests, declinationGuest)}.`;
+  offerCapacity.textContent = `${rooms} ${declination(rooms, declinationRooms)}
+   для ${guests} ${declination(guests, declinationGuests)}.`;
   offerTime.textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
 
   if (features) {

@@ -1,6 +1,7 @@
 import {sendData, getData} from './api.js';
 import {resetMap, clearMarkers, drawMarkers, MAX_OBJECTS} from './map.js';
 import {debounce} from './utils.js';
+import {resetPicture} from './photos.js';
 
 const MAX_PRICE = 100000;
 const RERENDER_DELAY = 500;
@@ -324,6 +325,7 @@ const resetForm = () => {
   resetMap();
   resetMapFilters();
   letMapFilter();
+  resetPicture();
   roomPriceField.placeholder = getDefaultPrice();
   sliderForm.noUiSlider.updateOptions({
     start: getDefaultPrice(),
