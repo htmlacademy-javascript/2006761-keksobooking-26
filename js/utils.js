@@ -1,4 +1,4 @@
-const declination = (number, words) => {
+const decline = (number, words) => {
   const value = number % 100;
   if (value % 10 === 1) {
     return words[0];
@@ -20,4 +20,6 @@ function debounce (callback, timeoutDelay = 500) {
   };
 }
 
-export {declination, debounce};
+const isPressEsc = (evt) => evt.key === 'Escape';
+
+export {decline, debounce, isPressEsc};
