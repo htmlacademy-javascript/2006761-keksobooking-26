@@ -1,4 +1,4 @@
-import {declination} from './utils.js';
+import {decline} from './utils.js';
 
 const housingTypesTranslate = {
   flat: 'Квартира',
@@ -18,28 +18,28 @@ const createOffer = (object) => {
   const {avatar} = object.author;
   const {title, address, price, type, rooms, guests, checkin, checkout, features, description, photos} = object.offer;
   const cloneCard = cardTemplate.cloneNode(true);
-  const offerAvatar = cloneCard.querySelector('.popup__avatar');
-  const offerTitle = cloneCard.querySelector('.popup__title');
-  const offerAddress = cloneCard.querySelector('.popup__text--address');
-  const offerPrice = cloneCard.querySelector('.popup__text--price');
-  const offerType = cloneCard.querySelector('.popup__type');
-  const offerCapacity = cloneCard.querySelector('.popup__text--capacity');
-  const offerTime = cloneCard.querySelector('.popup__text--time');
-  const offerFeaturesContainer = cloneCard.querySelector('.popup__features');
-  const offerDescription = cloneCard.querySelector('.popup__description');
-  const offerPhotosContainer = cloneCard.querySelector('.popup__photos');
+  const offerAvatarElement = cloneCard.querySelector('.popup__avatar');
+  const offerTitleElement = cloneCard.querySelector('.popup__title');
+  const offerAddressElement = cloneCard.querySelector('.popup__text--address');
+  const offerPriceElement = cloneCard.querySelector('.popup__text--price');
+  const offerTypeElement = cloneCard.querySelector('.popup__type');
+  const offerCapacityElement = cloneCard.querySelector('.popup__text--capacity');
+  const offerTimeElement = cloneCard.querySelector('.popup__text--time');
+  const offerFeaturesElement = cloneCard.querySelector('.popup__features');
+  const offerDescriptionElement = cloneCard.querySelector('.popup__description');
+  const offerPhotosElement = cloneCard.querySelector('.popup__photos');
 
-  offerAvatar.src = checkExistence(offerAvatar, avatar);
-  offerTitle.textContent = checkExistence(offerTitle, title);
-  offerAddress.textContent = checkExistence(offerAddress, address);
-  offerPrice.textContent = checkExistence(offerPrice, `${price} р/ночь`);
-  offerType.textContent = checkExistence(offerType, housingTypesTranslate[type]);
-  offerCapacity.textContent = `${rooms} ${declination(rooms, declinationRooms)}
-   для ${guests} ${declination(guests, declinationGuests)}.`;
-  offerTime.textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
+  offerAvatarElement.src = checkExistence(offerAvatarElement, avatar);
+  offerTitleElement.textContent = checkExistence(offerTitleElement, title);
+  offerAddressElement.textContent = checkExistence(offerAddressElement, address);
+  offerPriceElement.textContent = checkExistence(offerPriceElement, `${price} р/ночь`);
+  offerTypeElement.textContent = checkExistence(offerTypeElement, housingTypesTranslate[type]);
+  offerCapacityElement.textContent = `${rooms} ${decline(rooms, declinationRooms)}
+   для ${guests} ${decline(guests, declinationGuests)}.`;
+  offerTimeElement.textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
 
   if (features) {
-    const featuresList = offerFeaturesContainer.querySelectorAll('.popup__feature');
+    const featuresList = offerFeaturesElement.querySelectorAll('.popup__feature');
     featuresList.forEach((featuresListItem) => {
       const included = features.some(
         (feature) => featuresListItem.classList.contains(`popup__feature--${feature}`));
@@ -48,18 +48,18 @@ const createOffer = (object) => {
       }
     });
   } else {
-    offerFeaturesContainer.remove();
+    offerFeaturesElement.remove();
   }
 
-  offerDescription.textContent = checkExistence(offerDescription, description);
-  offerPhotosContainer.innerHTML = '';
+  offerDescriptionElement.textContent = checkExistence(offerDescriptionElement, description);
+  offerPhotosElement.innerHTML = '';
 
   if (photos) {
     photos.forEach((photo) => {
-      offerPhotosContainer.insertAdjacentHTML('beforeend', `<img src="${photo}" class="popup__photo" width="45" height="40" alt="Фотография жилья">`);
+      offerPhotosElement.insertAdjacentHTML('beforeend', `<img src="${photo}" class="popup__photo" width="45" height="40" alt="Фотография жилья">`);
     });
   } else {
-    offerPhotosContainer.remove();
+    offerPhotosElement.remove();
   }
 
   return cloneCard;

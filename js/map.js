@@ -1,4 +1,4 @@
-import {addressForm} from './form.js';
+import {addressFormElement} from './form.js';
 import {createOffer} from './popup.js';
 
 const DECIMAL_LENGTH = 5;
@@ -55,13 +55,13 @@ const drawMarkers = (ads) => {
 };
 
 const setDefaultAddress = () => {
-  addressForm.value = `${centerOfTokyo.lat}, ${centerOfTokyo.lng}`;
+  addressFormElement.value = `${centerOfTokyo.lat}, ${centerOfTokyo.lng}`;
 };
 
 mainPinMarker.on('move', (evt) => {
   const lat = evt.target.getLatLng().lat;
   const lng = evt.target.getLatLng().lng;
-  addressForm.value = `${lat.toFixed(DECIMAL_LENGTH)}, ${lng.toFixed(DECIMAL_LENGTH)}`;
+  addressFormElement.value = `${lat.toFixed(DECIMAL_LENGTH)}, ${lng.toFixed(DECIMAL_LENGTH)}`;
 });
 
 const loadMap = (cb) => {

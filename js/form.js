@@ -1,28 +1,28 @@
 import {sendData, getData} from './api.js';
 import {resetMap, clearMarkers, drawMarkers, MAX_OBJECTS} from './map.js';
-import {debounce} from './utils.js';
+import {debounce, isPressEsc} from './utils.js';
 import {resetPicture} from './photos.js';
 
 const MAX_PRICE = 100000;
 const RERENDER_DELAY = 500;
 
 const adForm = document.querySelector('.ad-form');
-const filterForm = document.querySelector('.map__filters');
+const filterFormElement = document.querySelector('.map__filters');
 const adFormElements = adForm.querySelectorAll('fieldset');
-const filterFormElements = filterForm.querySelectorAll(['select', 'fieldset']);
-const timeForm = adForm.querySelector('.ad-form__element--time');
-const sliderForm = adForm.querySelector('.ad-form__slider');
-const submitButton = adForm.querySelector('.ad-form__submit');
-const resetButtonForm = adForm.querySelector('.ad-form__reset');
+const filterFormElements = filterFormElement.querySelectorAll(['select', 'fieldset']);
+const timeFormElement = adForm.querySelector('.ad-form__element--time');
+const sliderFormElement = adForm.querySelector('.ad-form__slider');
+const submitButtonElement = adForm.querySelector('.ad-form__submit');
+const resetButtonFormElement = adForm.querySelector('.ad-form__reset');
 
-const roomPriceField = adForm.querySelector('#price');
-const roomNumberField = adForm.querySelector('#room_number');
-const roomCapacityField = adForm.querySelector('#capacity');
-const housingTypesForm = adForm.querySelector('#type');
-const defaultSelectedOption = housingTypesForm.querySelector('option[selected]');
-const checkInField = adForm.querySelector('#timein');
-const checkOutField = adForm.querySelector('#timeout');
-const addressForm = adForm.querySelector('#address');
+const roomPriceFieldElement = adForm.querySelector('#price');
+const roomNumberFieldElement = adForm.querySelector('#room_number');
+const roomCapacityFieldElement = adForm.querySelector('#capacity');
+const housingTypesFormElement = adForm.querySelector('#type');
+const defaultSelectedOptionElement = housingTypesFormElement.querySelector('option[selected]');
+const checkInFieldElement = adForm.querySelector('#timein');
+const checkOutFieldElement = adForm.querySelector('#timeout');
+const addressFormElement = adForm.querySelector('#address');
 const mapFiltersElement = document.querySelector('.map__filters');
 const housingFeaturesElement = mapFiltersElement.querySelector('#housing-features');
 
@@ -76,13 +76,13 @@ Pristine.addMessages('ru', {
   minlength: `Не менее \${${1}} символов`,
 });
 
-const getMinPrice = () => LIVING_PRICES[housingTypesForm.value];
-const getDefaultPrice = () => LIVING_PRICES[defaultSelectedOption.value];
+const getMinPrice = () => LIVING_PRICES[housingTypesFormElement.value];
+const getDefaultPrice = () => LIVING_PRICES[defaultSelectedOptionElement.value];
 
-roomPriceField.placeholder = getMinPrice();
+roomPriceFieldElement.placeholder = getMinPrice();
 
 //Create slider
-noUiSlider.create(sliderForm, {
+noUiSlider.create(sliderFormElement, {
   range: {
     min: 0,
     max: MAX_PRICE,
@@ -91,65 +91,61 @@ noUiSlider.create(sliderForm, {
   step: 1,
   connect: 'lower',
   format: {
-    to: function (value) {
-      return value.toFixed(0);
-    },
-    from: function (value) {
-      return parseFloat(value);
-    },
+    to: (value) => value.toFixed(0),
+    from: (value) => parseFloat(value)
   },
 });
-sliderForm.noUiSlider.updateOptions({
-  start: getMinPrice(),
-  range: {
-    'min': getMinPrice(),
-    'max': MAX_PRICE
-  }
-});
-//Event type of housing
-housingTypesForm.addEventListener('change', () => {
-  roomPriceField.placeholder = getMinPrice();
-  roomPriceField.min = getMinPrice();
-  sliderForm.noUiSlider.updateOptions({
-    start: getMinPrice(),
+
+const getSliderSetting = (setPrice) => {
+  sliderFormElement.noUiSlider.updateOptions({
+    start: setPrice,
     range: {
-      'min': getMinPrice(),
+      'min': setPrice,
       'max': MAX_PRICE
     }
   });
-  sliderForm.noUiSlider.set(roomPriceField.value);
-  pristine.validate(roomPriceField);
+};
+
+getSliderSetting(getMinPrice());
+
+//Event type of housing
+housingTypesFormElement.addEventListener('change', () => {
+  roomPriceFieldElement.placeholder = getMinPrice();
+  roomPriceFieldElement.min = getMinPrice();
+  getSliderSetting(getMinPrice());
+  sliderFormElement.noUiSlider.set(roomPriceFieldElement.value);
+  pristine.validate(roomPriceFieldElement);
 });
 
 //Synth slider and price
-sliderForm.noUiSlider.on('change', () => {
-  roomPriceField.value = sliderForm.noUiSlider.get();
-  pristine.validate(roomPriceField);
+sliderFormElement.noUiSlider.on('change', () => {
+  roomPriceFieldElement.value = sliderFormElement.noUiSlider.get();
+  pristine.validate(roomPriceFieldElement);
 });
 //Synth price and slider
-roomPriceField.addEventListener('change', () => {
-  sliderForm.noUiSlider.set(roomPriceField.value);
-  pristine.validate(roomPriceField);
+roomPriceFieldElement.addEventListener('change', () => {
+  sliderFormElement.noUiSlider.set(roomPriceFieldElement.value);
+  pristine.validate(roomPriceFieldElement);
 });
 
 //Validate
-const validateCapacity = (value) => CAPACITY_ROOMS[roomNumberField.value].includes(value);
-pristine.addValidator(roomCapacityField, validateCapacity, 'Гостей должно быть не больше чем комнат');
+const validateCapacity = (value) => CAPACITY_ROOMS[roomNumberFieldElement.value].includes(value);
+pristine.addValidator(roomCapacityFieldElement, validateCapacity, 'Гостей должно быть не больше чем комнат');
 
 const validatePrice = (value) => value >= getMinPrice() && value <= MAX_PRICE;
-const getPriceErrorMessage = (value) => (value >= getMinPrice()) ? `Не более ${MAX_PRICE}` : `Не менее ${getMinPrice()}`;
-pristine.addValidator(roomPriceField, validatePrice, getPriceErrorMessage);
+const priceErrorMessage = (value) => (value >= getMinPrice()) ? `Не более ${MAX_PRICE}` : `Не менее ${getMinPrice()}`;
+pristine.addValidator(roomPriceFieldElement, validatePrice, priceErrorMessage);
 
 //checkin-checkout
-timeForm.addEventListener('change', (evt) => {
-  checkInField.value = evt.target.value;
-  checkOutField.value = evt.target.value;
+timeFormElement.addEventListener('change', (evt) => {
+  checkInFieldElement.value = evt.target.value;
+  checkOutFieldElement.value = evt.target.value;
 });
 
 // Enable/Disable form
 const setDisabledForm = () => {
   adForm.classList.add('ad-form--disabled');
-  filterForm.classList.add('ad-form--disabled');
+  filterFormElement.classList.add('ad-form--disabled');
   adFormElements.forEach((element) => {
     element.setAttribute('disabled', 'disabled');
   });
@@ -158,13 +154,12 @@ const setDisabledForm = () => {
     element.setAttribute('disabled', 'disabled');
   });
 
-  sliderForm.setAttribute('disabled', true);
-
+  sliderFormElement.setAttribute('disabled', true);
 };
 
 const setEnabledForm = () => {
   adForm.classList.remove('ad-form--disabled');
-  filterForm.classList.remove('ad-form--disabled');
+  filterFormElement.classList.remove('ad-form--disabled');
   adFormElements.forEach((element) => {
     element.removeAttribute('disabled');
   });
@@ -172,38 +167,39 @@ const setEnabledForm = () => {
   filterFormElements.forEach((element) => {
     element.removeAttribute('disabled');
   });
-  sliderForm.removeAttribute('disabled');
-  sliderForm.noUiSlider.updateOptions({
+  sliderFormElement.removeAttribute('disabled');
+  sliderFormElement.noUiSlider.updateOptions({
     start: getMinPrice(),
     range: {
       'min': getMinPrice(),
       'max': MAX_PRICE
     }
   });
-
 };
 
+const onMessageClick = (evt) => {
+  evt.preventDefault();
+  closeMessage();
+};
+
+const onMessageEscKeydown = (evt) => {
+  if (isPressEsc(evt)) {
+    closeMessage();
+  }
+};
+function closeMessage () {
+  document.body.lastChild.remove();
+
+  document.removeEventListener('keydown', onMessageEscKeydown);
+  document.removeEventListener('click', onMessageClick);
+}
 //Success/error messages
 const getSuccessMessage = () => {
   const message = successMessageTemplate.cloneNode(true);
   document.body.appendChild(message);
 
-  const escEvent = (evt) => {
-    if (evt.key === 'Escape') {
-      message.remove();
-      document.removeEventListener('keydown', escEvent);
-    }
-  };
-
-  document.addEventListener('keydown', escEvent);
-
-
-  const clickEvent = () => {
-    document.removeEventListener('click', clickEvent);
-    message.remove();
-  };
-
-  document.addEventListener('click', clickEvent);
+  document.addEventListener('keydown', onMessageEscKeydown);
+  document.addEventListener('click', onMessageClick);
 };
 
 const getErrorMessage = (err) => {
@@ -217,33 +213,19 @@ const getErrorMessage = (err) => {
     message.remove();
   });
 
-  const escEvent = (evt) => {
-    if (evt.key === 'Escape') {
-      message.remove();
-      document.removeEventListener('keydown', escEvent);
-    }
-  };
-
-  document.addEventListener('keydown', escEvent);
-
-
-  const clickEvent = () => {
-    document.removeEventListener('click', clickEvent);
-    message.remove();
-  };
-
-  document.addEventListener('click', clickEvent);
+  document.addEventListener('keydown', onMessageEscKeydown);
+  document.addEventListener('click', onMessageClick);
 };
 
 //Enable/disable submit button
 const disableSubmitButton = () => {
-  submitButton.disabled = true;
-  submitButton.textContent = 'Ожидайте...';
+  submitButtonElement.disabled = true;
+  submitButtonElement.textContent = 'Ожидайте...';
 };
 
 const enableSubmitButton = () => {
-  submitButton.disabled = false;
-  submitButton.textContent = 'Опубликовать';
+  submitButtonElement.disabled = false;
+  submitButtonElement.textContent = 'Опубликовать';
 };
 
 //filter
@@ -276,12 +258,16 @@ const getFilteredAds = (ads) => {
   && filterFeatures(element);
 
   const filteredAds = [];
-  for (let i = 0; i < ads.length; i++) {
-    if(checkFilters(ads[i])) {
-      filteredAds.push(ads[i]);
+  for (const value of ads) {
+    if(checkFilters(value)) {
+      filteredAds.push(value);
+    }
+
+    if(filteredAds.length >= MAX_OBJECTS) {
+      break;
     }
   }
-  return filteredAds.slice(0, MAX_OBJECTS);
+  return filteredAds;
 };
 
 const letMapFilter = () => {
@@ -296,8 +282,7 @@ const mapFilterUpdate = () => {
       clearMarkers();
       drawMarkers(getFilteredAds(ads));
     });
-  }, RERENDER_DELAY)
-  );
+  }, RERENDER_DELAY));
 };
 
 const resetMapFilters = () => {
@@ -326,17 +311,11 @@ const resetForm = () => {
   resetMapFilters();
   letMapFilter();
   resetPicture();
-  roomPriceField.placeholder = getDefaultPrice();
-  sliderForm.noUiSlider.updateOptions({
-    start: getDefaultPrice(),
-    range: {
-      'min': getDefaultPrice(),
-      'max': MAX_PRICE
-    }
-  });
+  roomPriceFieldElement.placeholder = getDefaultPrice();
+  getSliderSetting(getDefaultPrice());
 };
 
-resetButtonForm.addEventListener('click', (evt) => {
+resetButtonFormElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   resetForm();
 });
@@ -350,7 +329,7 @@ export {
   getErrorMessage,
   setDisabledForm,
   setEnabledForm,
-  addressForm,
+  addressFormElement,
   resetMapFilters,
   letMapFilter,
   mapFilterUpdate
